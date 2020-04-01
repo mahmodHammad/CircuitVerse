@@ -32,7 +32,7 @@ layoutMode = false; // Flag for mode
 
 forceResetNodes = true; // FLag to reset all Nodes
 
-var wait =false;
+var wait =false;        
 var customKeyChange =false;
 
 var commandFound=false
@@ -41,9 +41,6 @@ var indexFlag
 let selectedCommand
 //Exact same name as object constructor
 //This list needs to be updated when new circuitselements are created
-
-
-
 
 
 // 0 keys , 1 CTRL , 2 SHIFT
@@ -76,41 +73,40 @@ if(custumeShortCuts){
     window.localStorage.setItem("custumeShortCuts" , JSON.stringify(initCustumeShortCuts))
 }
 
+function printCustomeShortCut(c){
+    return `<span class="command">${c[3]}</span>${getKeys(c)}`
+ }
+ function getKeys(c){
+    let value =''
+    if(c[1]) value+=extraKey("CTRL")
+    if(c[2])value+=extraKey("SHIFT")
+        
+    c[0].forEach(k=> {
+        let keyName = String.fromCharCode(k)
+        value+=`<kbd>${keyName}</kbd>`
+    })
+    return value
+}
+ function extraKey(key){
+    return `<kbd>${key}</kbd> <span class="addSign"> + </span>`
+}
 
 
 let keys = document.getElementById("keys")
 
-    function getKeys(c){
-      let value =''
-      if(c[1]){
-        value+='<kbd>CTRL</kbd> <span class="addSign"> + </span>'
-    }
-    if(c[2]){
-        value+='<kbd>SHIFT</kbd> <span class="addSign"> + </span>'
-    }
-     
-          c[0].forEach(k=> {
-              let keyName = String.fromCharCode(k)
-              value+=`<kbd>${keyName}</kbd>`
-          })
+
+    keymap.forEach(c=>{
+        keys.innerHTML+= `<p class="shortcut" id=${c[3]}>${printCustomeShortCut(c)} </p>`
+    })
       
-      return value
-    }
-function printCustomeShortCut(c){
-   return `<span class="command">${c[3]}</span>${getKeys(c)}`
-}
-keymap.forEach(c=>{
-          keys.innerHTML+= `<p class="shortcut" id=${c[3]}>${printCustomeShortCut(c)} </p>`
-      })
-      
-      var wait =false
-      $(".shortcut").click(function(e){
+    var wait =false
+    $(".shortcut").click(function(e){
         wait=true
         customKeyChange=true
         selectedCommand =e.currentTarget.id
         $('#enterKey').show()
-
     })
+    
 
 function handleDesired(e){
     let Displayedkey=''
@@ -118,11 +114,11 @@ function handleDesired(e){
     if(customKeyChange){
         e.preventDefault();
         if(e.ctrlKey){
-            Displayedkey+='<kbd>CTRL</kbd> <span class="addSign"> + </span>'
+            Displayedkey+=extraKey("CTRL")
             keyvalue[1]=1
         }
         if(e.shiftKey){
-            Displayedkey+='<kbd>SHIFT</kbd> <span class="addSign"> + </span>'
+            Displayedkey+=extraKey("SHIFT")
             keyvalue[2]=1
         }
         if(!(e.keyCode==16 || e.keyCode==17 ||e.keyCode==13 ||e.keyCode==27)){
@@ -156,11 +152,8 @@ function handleDesired(e){
                     $("#"+c[3]).html(printCustomeShortCut(fullKeyValue))    
                     return fullKeyValue
                 }
-
-                else
-                    return c
-                })
-              
+                else return c
+                }) 
             window.localStorage.setItem('custumeShortCuts',JSON.stringify(keymap))
         }
     }
